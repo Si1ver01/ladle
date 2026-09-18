@@ -192,6 +192,7 @@ export type Config = {
   mode?: string;
   expandStoryTree?: boolean;
   noWatch: boolean;
+  open: boolean;
   hotkeys: {
     fullscreen: string[];
     search: string[];

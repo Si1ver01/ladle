@@ -11,6 +11,7 @@ export default {
   appendToHead: "",
   disableHttp2: false,
   noWatch: false,
+  open: true,
   port: 61000,
   previewPort: 8080,
   hmrHost: undefined,

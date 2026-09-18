@@ -12,6 +12,7 @@ export default async function applyCLIConfig(params) {
   debug(`CLI host: ${params.host || "undefined"}`);
   debug(`CLI port: ${params.port || "undefined"}`);
   debug(`CLI out: ${params.outDir || "undefined"}`);
+  debug(`CLI open browser: ${params.open ?? "undefined"}`);
   params.config = params.config || ".ladle";
   const configFolder = path.isAbsolute(params.config)
     ? params.config

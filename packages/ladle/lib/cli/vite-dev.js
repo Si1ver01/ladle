@@ -123,10 +123,12 @@ const bundler = async (config, configFolder) => {
 
       config.onDevServerStart(serverUrl);
 
-      if (
+      const shouldOpenBrowser =
+        config.open &&
         vite.config.server.open !== "none" &&
-        vite.config.server.open !== false
-      ) {
+        vite.config.server.open !== false;
+      debug(`Open browser: ${shouldOpenBrowser}`);
+      if (shouldOpenBrowser) {
         openBrowser(serverUrl);
       }
     };
