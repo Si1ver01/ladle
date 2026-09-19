@@ -167,6 +167,7 @@ export type GeneratedStories = {
 export type CLIParams = Partial<Config> & {
   theme?: ThemeState;
   config?: string;
+  open?: boolean;
 };
 
 export type PluginOptions = {
@@ -192,7 +193,6 @@ export type Config = {
   mode?: string;
   expandStoryTree?: boolean;
   noWatch: boolean;
-  open: boolean;
   hotkeys: {
     fullscreen: string[];
     search: string[];

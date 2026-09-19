@@ -35,7 +35,7 @@ const waitFor = async (
   throw lastError;
 };
 
-const startLadle = async (args: string[]) => {
+const startLadle = async (command: "serve" | "dev", args: string[]) => {
   const temporaryDirectory = await mkdtemp(
     path.join(tmpdir(), "ladle-no-open-"),
   );
@@ -57,7 +57,7 @@ const startLadle = async (args: string[]) => {
     process.execPath,
     [
       cliPath,
-      "serve",
+      command,
       "--port",
       String(port),
       "--viteConfig",
@@ -100,10 +100,13 @@ afterEach(async () => {
   for (const child of processes) {
     if (child.exitCode === null) {
       child.kill("SIGTERM");
-      await Promise.race([
-        new Promise((resolve) => child.once("exit", resolve)),
-        delay(5_000),
+      const exited = await Promise.race([
+        new Promise<true>((resolve) => child.once("exit", () => resolve(true))),
+        delay(5_000).then(() => false),
       ]);
+      if (!exited && child.exitCode === null) {
+        child.kill("SIGKILL");
+      }
     }
   }
   processes.clear();
@@ -114,17 +117,21 @@ afterEach(async () => {
   temporaryDirectories.clear();
 });
 
-test("serve --no-open starts without invoking the browser script", async () => {
-  const { markerPath, url } = await startLadle(["--no-open"]);
+test.each(["serve", "dev"] as const)(
+  "%s --no-open starts without invoking the browser script",
+  async (command) => {
+    const { markerPath, url } = await startLadle(command, ["--no-open"]);
 
-  const response = await fetch(url);
-  expect(await response.text()).toContain("Ladle");
-  await delay(500);
-  expect(existsSync(markerPath)).toBe(false);
-}, 20_000);
+    const response = await fetch(url);
+    expect(await response.text()).toContain("Ladle");
+    await delay(500);
+    expect(existsSync(markerPath)).toBe(false);
+  },
+  20_000,
+);
 
 test("serve invokes the browser script by default", async () => {
-  const { markerPath } = await startLadle([]);
+  const { markerPath } = await startLadle("serve", []);
 
   await waitFor(() => {
     expect(existsSync(markerPath)).toBe(true);
